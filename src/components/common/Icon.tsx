@@ -1,0 +1,112 @@
+import React from 'react';
+import * as Lucide from 'lucide-react';
+
+interface IconProps {
+  name: string;
+  size?: number;
+  color?: string;
+  style?: React.CSSProperties;
+}
+
+const iconMap: Record<string, keyof typeof Lucide> = {
+  'wallet-outline': 'Wallet',
+  'wallet': 'Wallet',
+  'chart-pie': 'PieChart',
+  'credit-card-outline': 'CreditCard',
+  'chart-bar': 'BarChart3',
+  'piggy-bank-outline': 'PiggyBank',
+  'arrow-up': 'ArrowUp',
+  'arrow-down': 'ArrowDown',
+  'arrow-left': 'ArrowLeft',
+  'plus': 'Plus',
+  'bell-outline': 'Bell',
+  'pencil-outline': 'Pencil',
+  'dots-horizontal': 'MoreHorizontal',
+  'tag': 'Tag',
+  'bank': 'Building2',
+  'food': 'Utensils',
+  'leaf': 'Leaf',
+  'cart': 'ShoppingCart',
+  'cake': 'Cake',
+  'food-apple': 'Apple',
+  'home': 'Home',
+  'home-city': 'Building',
+  'flash': 'Zap',
+  'fire': 'Flame',
+  'cellphone': 'Smartphone',
+  'tshirt-crew': 'Shirt',
+  'school': 'GraduationCap',
+  'heart-pulse': 'HeartPulse',
+  'palette-outline': 'Palette',
+  'train': 'Train',
+  'wifi': 'Wifi',
+  'movie': 'Film',
+  'gift': 'Gift',
+  'gift-outline': 'Gift',
+  'chart-line': 'TrendingUp',
+  'airplane': 'Plane',
+  'gas-station': 'Fuel',
+  'coffee': 'Coffee',
+  'silverware-fork-knife': 'UtensilsCrossed',
+  'food-variant': 'Soup',
+  'cash': 'Banknote',
+  'briefcase': 'Briefcase',
+  'cash-refund': 'Undo2',
+  'trending-up': 'TrendingUp',
+  'cash-multiple': 'Coins',
+  'logout': 'LogOut',
+  'chevron-right': 'ChevronRight',
+  'chevron-left': 'ChevronLeft',
+  'chevron-down': 'ChevronDown',
+  'chevron-up': 'ChevronUp',
+  'account-outline': 'User',
+  'account': 'User',
+  'theme-light-dark': 'Contrast',
+  'file-excel-outline': 'FileSpreadsheet',
+  'database-sync-outline': 'Database',
+  'receipt-text-outline': 'Receipt',
+  'chart-line-variant': 'LineChart',
+  'sort-numeric-ascending': 'SortAsc',
+  'sort-numeric-descending': 'SortDesc',
+  'arrow-top-right-bold': 'ArrowUpRight',
+  'tag-outline': 'Tag',
+  'cog': 'Settings',
+  'plus-circle-outline': 'PlusCircle',
+  'currency-usd': 'DollarSign',
+  'gesture-swipe-horizontal': 'GalleryHorizontalEnd',
+  'close': 'X',
+  'check-circle': 'CheckCircle',
+  'calendar': 'Calendar',
+  'alert-circle-outline': 'AlertCircle',
+  'download-outline': 'Download',
+  'trash-can-outline': 'Trash2',
+  'eye': 'Eye',
+  'eye-off': 'EyeOff',
+  'eye-outline': 'Eye',
+  'eye-off-outline': 'EyeOff',
+  'check': 'Check',
+  'information-outline': 'Info',
+  'lock-outline': 'Lock',
+  'email-outline': 'Mail',
+  'phone-outline': 'Phone',
+  'image-outline': 'Image',
+  'camera-outline': 'Camera',
+  'star': 'Star',
+  'star-outline': 'Star',
+  'heart': 'Heart',
+  'share-variant': 'Share2',
+  'edit': 'Edit3',
+  'delete': 'Trash2',
+  'content-copy': 'Copy',
+  'filter-variant': 'Filter',
+  'magnify': 'Search',
+};
+
+const Icon: React.FC<IconProps> = ({ name, size = 24, color = 'currentColor', style }) => {
+  const lucideName = iconMap[name] || 'HelpCircle';
+  const LucideIcon = (Lucide[lucideName] as React.FC<any>) || Lucide.HelpCircle;
+
+  return <LucideIcon size={size} color={color} style={style} />;
+};
+
+export default Icon;
