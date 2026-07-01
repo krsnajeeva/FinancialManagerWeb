@@ -178,9 +178,10 @@ const NavigationWrapper: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const basename = import.meta.env.DEV ? '/' : '/FinancialManagerWeb';
   return (
     <Provider store={store}>
-      <Router>
+      <Router basename={basename}>
         <NavigationWrapper />
       </Router>
     </Provider>
