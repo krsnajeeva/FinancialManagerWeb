@@ -512,30 +512,34 @@ const StatisticsScreen: React.FC = () => {
               flexDirection: 'column',
             }}
           >
-            {topSpending.map(item => {
+            {topSpending.map((item, index) => {
               const isSelected = item.id === selectedTransactionId;
               return (
-                <Swipeable
-                  key={item.id}
-                  onDelete={() => handleDeleteTransaction(item.id, item.type)}
-                  borderRadius={12}
-                  swipeEnabled={swipeEnabled}
-                  backgroundColor={isSelected ? theme.accent : theme.cardBackground}
-                >
-                  <TransactionItem
-                    category={item.category}
-                    description={item.description}
-                    date={item.date}
-                    amount={item.amount}
-                    type={item.type}
-                    selected={isSelected}
-                    onPress={() => {
-                      setSelectedTransactionId(
-                        item.id === selectedTransactionId ? null : item.id
-                      );
-                    }}
-                  />
-                </Swipeable>
+                <div key={item.id} style={{ display: 'flex', flexDirection: 'column', width: '100%', flexShrink: 0 }}>
+                  <Swipeable
+                    onDelete={() => handleDeleteTransaction(item.id, item.type)}
+                    borderRadius={12}
+                    swipeEnabled={swipeEnabled}
+                    backgroundColor={isSelected ? theme.accent : theme.cardBackground}
+                  >
+                    <TransactionItem
+                      category={item.category}
+                      description={item.description}
+                      date={item.date}
+                      amount={item.amount}
+                      type={item.type}
+                      selected={isSelected}
+                      onPress={() => {
+                        setSelectedTransactionId(
+                          item.id === selectedTransactionId ? null : item.id
+                        );
+                      }}
+                    />
+                  </Swipeable>
+                  {index < topSpending.length - 1 && (
+                    <div style={{ height: '1px', backgroundColor: theme.border, margin: '0 16px' }} />
+                  )}
+                </div>
               );
             })}
           </div>

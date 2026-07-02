@@ -31,7 +31,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '16px',
+        padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 16px 16px',
         width: '100%',
       }}
     >

@@ -23,7 +23,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   ];
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100dvh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       {/* Ambient background — behind everything */}
       <div className="ambient-bg" />
 
@@ -41,12 +41,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             style={{
               backgroundColor: theme.tabBarBackground,
               borderTop: `1px solid ${theme.tabBarBorder}`,
-              height: '64px',
+              height: 'calc(64px + env(safe-area-inset-bottom, 0px))',
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
               alignItems: 'center',
-              paddingBottom: '4px',
+              paddingBottom: 'calc(4px + env(safe-area-inset-bottom, 0px))',
               zIndex: 100,
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',

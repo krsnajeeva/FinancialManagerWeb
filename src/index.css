@@ -16,12 +16,14 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
 #root {
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -45,6 +47,7 @@ body {
   width: 100%;
   max-width: 480px;
   height: 100vh;
+  height: 100dvh;
   background-color: #f5f7fb;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;

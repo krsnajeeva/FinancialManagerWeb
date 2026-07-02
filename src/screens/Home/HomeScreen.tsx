@@ -172,7 +172,7 @@ const HomeScreen: React.FC = () => {
             borderBottomLeftRadius: '28px',
             borderBottomRightRadius: '28px',
             paddingBottom: '110px',
-            paddingTop: '24px',
+            paddingTop: 'calc(24px + env(safe-area-inset-top, 0px))',
             display: 'flex',
             flexDirection: 'column',
           }}

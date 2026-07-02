@@ -494,55 +494,64 @@ const BudgetScreen: React.FC = () => {
               );
 
               return (
-                <Swipeable
+                <div
                   key={catBudget.id}
-                  onDelete={() => handleDeleteBudget(catBudget.id)}
-                  borderRadius={12}
-                  containerStyle={{ marginBottom: index === categoryBudgets.length - 1 ? 0 : '20px' }}
-                  swipeEnabled={swipeEnabled}
-                  backgroundColor={theme.cardBackground}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    flexShrink: 0,
+                    marginBottom: index === categoryBudgets.length - 1 ? 0 : '20px',
+                  }}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
-                        <div
-                          style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '18px',
-                            backgroundColor: `${categoryData?.color || theme.accent}15`,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Icon
-                            name={categoryData?.icon || 'tag-outline'}
-                            size={20}
-                            color={categoryData?.color || theme.accent}
-                          />
+                  <Swipeable
+                    onDelete={() => handleDeleteBudget(catBudget.id)}
+                    borderRadius={12}
+                    swipeEnabled={swipeEnabled}
+                    backgroundColor={theme.cardBackground}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '18px',
+                              backgroundColor: `${categoryData?.color || theme.accent}15`,
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Icon
+                              name={categoryData?.icon || 'tag-outline'}
+                              size={20}
+                              color={categoryData?.color || theme.accent}
+                            />
+                          </div>
+                          <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
+                            {catBudget.category}
+                          </span>
                         </div>
                         <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
-                          {catBudget.category}
+                          ₹{formatAmount(catBudget.budgetAmount)}
                         </span>
                       </div>
-                      <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
-                        ₹{formatAmount(catBudget.budgetAmount)}
-                      </span>
-                    </div>
 
-                    <CenteredProgressBar percentage={percentage} color={categoryData?.color || theme.accent} />
+                      <CenteredProgressBar percentage={percentage} color={categoryData?.color || theme.accent} />
 
-                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '4px' }}>
-                      <span style={{ fontSize: '12px', color: theme.secondaryText, fontWeight: '500' }}>
-                        ₹{formatAmount(spent)}
-                      </span>
-                      <span style={{ fontSize: '12px', color: theme.secondaryText, fontWeight: '500' }}>
-                        ₹{formatAmount(remaining)}
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '4px' }}>
+                        <span style={{ fontSize: '12px', color: theme.secondaryText, fontWeight: '500' }}>
+                          ₹{formatAmount(spent)}
+                        </span>
+                        <span style={{ fontSize: '12px', color: theme.secondaryText, fontWeight: '500' }}>
+                          ₹{formatAmount(remaining)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Swipeable>
+                  </Swipeable>
+                </div>
               );
             })}
           </div>
