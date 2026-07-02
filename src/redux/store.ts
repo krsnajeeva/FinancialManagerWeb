@@ -33,7 +33,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: customStorage,
-  whitelist: ['income', 'expense', 'budget'],
+  whitelist: ['income', 'expense', 'budget', 'settings'],
 };
 
 const rootReducer = combineReducers({
