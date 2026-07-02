@@ -76,6 +76,8 @@ const iconMap: Record<string, keyof typeof Lucide> = {
   'gesture-swipe-horizontal': 'GalleryHorizontalEnd',
   'close': 'X',
   'check-circle': 'CheckCircle',
+  'checkbox-marked': 'CheckSquare',
+  'checkbox-blank-outline': 'Square',
   'calendar': 'Calendar',
   'alert-circle-outline': 'AlertCircle',
   'download-outline': 'Download',
