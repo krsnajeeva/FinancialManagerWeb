@@ -1,13 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { useTheme } from '../../hooks/useTheme';
-import {
-  selectTotalIncome,
-  selectTotalExpense,
-  selectCurrentBalance,
-  selectRecentTransactions,
-} from '../../redux/selectors';
 import { setIncomes } from '../../redux/slices/incomeSlice';
 import { setExpenses } from '../../redux/slices/expenseSlice';
 import { setBudget, setCategoryBudgets } from '../../redux/slices/budgetSlice';
@@ -35,22 +30,81 @@ const HomeScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const theme = useTheme();
 
-  const totalIncome = useAppSelector(selectTotalIncome);
-  const totalExpense = useAppSelector(selectTotalExpense);
-  const currentBalance = useAppSelector(selectCurrentBalance);
-  const recentTransactions = useAppSelector(selectRecentTransactions);
+  const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().month() + 1);
+  const [selectedYear, setSelectedYear] = useState<number>(dayjs().year());
+
   const userName = useAppSelector(state => state.settings.userName);
   const userId = useAppSelector(state => state.settings.userId);
   const incomes = useAppSelector(state => state.income.incomes);
+  const expenses = useAppSelector(state => state.expense.expenses);
   const swipeEnabled = useAppSelector(state => state.settings.swipeEnabled);
+  const openingBalanceSetting = useAppSelector(state => state.settings.openingBalance);
+
+  const totalIncome = useMemo(() => {
+    return incomes
+      .filter(income => {
+        const d = dayjs(income.date);
+        return (
+          income.category !== 'Balance Carried Forward' &&
+          d.month() + 1 === selectedMonth &&
+          d.year() === selectedYear
+        );
+      })
+      .reduce((sum, income) => sum + income.amount, 0);
+  }, [incomes, selectedMonth, selectedYear]);
+
+  const totalExpense = useMemo(() => {
+    return expenses
+      .filter(expense => {
+        const d = dayjs(expense.date);
+        return d.month() + 1 === selectedMonth && d.year() === selectedYear;
+      })
+      .reduce((sum, expense) => sum + expense.amount, 0);
+  }, [expenses, selectedMonth, selectedYear]);
+
+  const openingBalance = useMemo(() => {
+    const monthStr = `${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`;
+    const bcfEntry = incomes.find(
+      i =>
+        i.category === 'Balance Carried Forward' &&
+        dayjs(i.date).format('YYYY-MM') === monthStr
+    );
+    return bcfEntry ? bcfEntry.amount : openingBalanceSetting;
+  }, [incomes, selectedMonth, selectedYear, openingBalanceSetting]);
+
+  const currentBalance = openingBalance + totalIncome - totalExpense;
+
+  const recentTransactions = useMemo(() => {
+    const periodIncomes = incomes
+      .filter(income => {
+        const d = dayjs(income.date);
+        return d.month() + 1 === selectedMonth && d.year() === selectedYear;
+      })
+      .map(i => ({
+        ...i,
+        type: 'income' as const,
+      }));
+
+    const periodExpenses = expenses
+      .filter(expense => {
+        const d = dayjs(expense.date);
+        return d.month() + 1 === selectedMonth && d.year() === selectedYear;
+      })
+      .map(e => ({
+        ...e,
+        type: 'expense' as const,
+      }));
+
+    return [...periodIncomes, ...periodExpenses]
+      .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+      .slice(0, 10);
+  }, [incomes, expenses, selectedMonth, selectedYear]);
 
   useEffect(() => {
     if (USE_STATIC_DATA) {
       if (incomes.length === 0) {
         dispatch(setIncomes(mockIncomes));
         dispatch(setExpenses(mockExpenses));
-        dispatch(setBudget(mockBudget));
-        dispatch(setCategoryBudgets(mockCategoryBudgets));
       }
       return;
     }
@@ -75,32 +129,38 @@ const HomeScreen: React.FC = () => {
       })
       .catch(err => console.error('Error fetching user name:', err));
 
-    // Fetch Incomes
-    incomeFirebaseService.getAll(userId)
-      .then(data => dispatch(setIncomes(data)))
-      .catch(err => console.error('Error loading incomes:', err));
+    // Fetch Incomes & Expenses
+    Promise.all([
+      incomeFirebaseService.getAll(userId),
+      expenseFirebaseService.getAll(userId),
+    ])
+      .then(([incomesData, expensesData]) => {
+        dispatch(setIncomes(incomesData));
+        dispatch(setExpenses(expensesData));
+      })
+      .catch(err => console.error('Error loading transaction data:', err));
+  }, [dispatch, userId]);
 
-    // Fetch Expenses
-    expenseFirebaseService.getAll(userId)
-      .then(data => dispatch(setExpenses(data)))
-      .catch(err => console.error('Error loading expenses:', err));
+  useEffect(() => {
+    if (USE_STATIC_DATA) {
+      dispatch(setBudget(mockBudget));
+      dispatch(setCategoryBudgets(mockCategoryBudgets));
+      return;
+    }
+
+    if (!userId) return;
 
     // Fetch Budget
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-    budgetFirebaseService.getBudget(currentMonth, currentYear, userId)
+    budgetFirebaseService.getBudget(selectedMonth, selectedYear, userId)
       .then(b => {
-        if (b) {
-          dispatch(setBudget(b));
-        }
+        dispatch(setBudget(b));
       })
       .catch(err => console.error('Error loading budget:', err));
 
-    budgetFirebaseService.getCategoryBudgets(currentMonth, currentYear, userId)
+    budgetFirebaseService.getCategoryBudgets(selectedMonth, selectedYear, userId)
       .then(cats => dispatch(setCategoryBudgets(cats)))
       .catch(err => console.error('Error loading category budgets:', err));
-
-  }, [dispatch, userId]);
+  }, [dispatch, userId, selectedMonth, selectedYear]);
 
   const handleDeleteTransaction = async (id: string, type: 'income' | 'expense') => {
     try {
@@ -189,15 +249,15 @@ const HomeScreen: React.FC = () => {
           >
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: '400' }}>
-                {getGreeting()}
+                {getGreeting()}, {userName}
               </span>
               <span style={{ fontSize: '20px', fontWeight: '700', color: COLORS.white, marginTop: '2px' }}>
-                {userName}
+                {dayjs().month(selectedMonth - 1).year(selectedYear).format('MMMM YYYY')}
               </span>
             </div>
 
-            {/* Notification bell */}
-            <div style={{ position: 'relative' }}>
+            {/* Calendar month-year picker overlaying button */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <button
                 style={{
                   width: '44px',
@@ -213,19 +273,29 @@ const HomeScreen: React.FC = () => {
                 }}
                 className="active-opacity"
               >
-                <Icon name="bell-outline" size={22} color={COLORS.white} />
+                <Icon name="calendar-month-outline" size={22} color={COLORS.white} />
               </button>
-              <div
+              <input
+                type="month"
+                value={`${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val) {
+                    const parts = val.split('-');
+                    setSelectedYear(parseInt(parts[0], 10));
+                    setSelectedMonth(parseInt(parts[1], 10));
+                  }
+                }}
                 style={{
                   position: 'absolute',
-                  top: '9px',
-                  right: '9px',
-                  width: '9px',
-                  height: '9px',
-                  borderRadius: '5px',
-                  backgroundColor: '#FF6D00',
-                  border: `1.5px solid ${theme.accent}`,
-                  animation: 'pulse 1.8s infinite',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
+                  border: 'none',
+                  outline: 'none',
                 }}
               />
             </div>
