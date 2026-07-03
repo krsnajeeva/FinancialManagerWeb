@@ -13,4 +13,5 @@ export interface CategoryBudget {
   month: number;
   year: number;
   userId?: string;
+  description?: string;
 }

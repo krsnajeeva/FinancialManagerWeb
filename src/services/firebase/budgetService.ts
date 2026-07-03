@@ -60,6 +60,7 @@ export const budgetFirebaseService = {
       return {
         id: docSnap.id,
         category: data.category || '',
+        description: data.description || '',
         budgetAmount: data.budgetAmount || 0,
         month: data.month,
         year: data.year,

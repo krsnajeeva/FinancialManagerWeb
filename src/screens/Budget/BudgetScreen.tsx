@@ -530,9 +530,16 @@ const BudgetScreen: React.FC = () => {
                               color={categoryData?.color || theme.accent}
                             />
                           </div>
-                          <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
-                            {catBudget.category}
-                          </span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
+                              {catBudget.category}
+                            </span>
+                            {catBudget.description && (
+                              <span style={{ fontSize: '11px', color: theme.secondaryText, marginTop: '2px' }}>
+                                {catBudget.description}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <span style={{ fontSize: '14px', fontWeight: '700', color: theme.primaryText }}>
                           ₹{formatAmount(catBudget.budgetAmount)}
