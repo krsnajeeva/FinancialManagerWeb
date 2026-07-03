@@ -49,6 +49,8 @@ const iconMap: Record<string, keyof typeof Lucide> = {
   'coffee': 'Coffee',
   'silverware-fork-knife': 'UtensilsCrossed',
   'food-variant': 'Soup',
+  'fruit-grapes': 'Grape',
+  'glass-milk': 'Milk',
   'cash': 'Banknote',
   'briefcase': 'Briefcase',
   'cash-refund': 'Undo2',

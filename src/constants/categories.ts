@@ -7,6 +7,8 @@ export interface Category {
 
 export const EXPENSE_CATEGORIES: Category[] = [
   {id: 'food', name: 'Food', icon: 'food', color: '#FF9800'},
+  {id: 'fruits', name: 'Fruits', icon: 'fruit-grapes', color: '#EC407A'},
+  {id: 'milk', name: 'Milk', icon: 'glass-milk', color: '#26C6DA'},
   {id: 'vegetables', name: 'Vegetables', icon: 'leaf', color: '#4CAF50'},
   {id: 'groceries', name: 'Groceries', icon: 'cart', color: '#2196F3'},
   {id: 'cake', name: 'Cake', icon: 'cake', color: '#E91E63'},
