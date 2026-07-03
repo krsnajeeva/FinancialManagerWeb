@@ -79,6 +79,7 @@ const iconMap: Record<string, keyof typeof Lucide> = {
   'checkbox-marked': 'CheckSquare',
   'checkbox-blank-outline': 'Square',
   'calendar': 'Calendar',
+  'calendar-month-outline': 'Calendar',
   'alert-circle-outline': 'AlertCircle',
   'download-outline': 'Download',
   'trash-can-outline': 'Trash2',
