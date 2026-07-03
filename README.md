@@ -1,32 +1,23 @@
-# React + TypeScript + Vite
+# Financial Manager Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A premium, fully responsive React web application mirroring the features, logic, and aesthetics of the FinancialManager mobile application.
 
-Currently, two official plugins are available:
+## Tech Stack
+- **Framework**: React 19 + TypeScript + Vite
+- **State Management**: Redux Toolkit + Redux Persist
+- **Styling**: Vanilla CSS with HSL variables, theme tokens, and safe area metrics
+- **Icons**: Lucide React icon mappings
+- **Deployment**: GitHub Pages
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
+- Dynamic mobile viewport compatibility using `100dvh`
+- Safe area support for notch and home-indicator viewports
+- Scroll-friendly list components for transactions and budgets
+- Interactive calendar date/month picker on Home screen
+- Balance card visibility toggle for privacy
+- Firestore-backed transaction management
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Scripts
+- `npm run dev` - Start local development server
+- `npm run build` - Build production bundle
+- `npm run deploy` - Build and deploy to GitHub Pages
