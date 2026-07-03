@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
@@ -32,6 +32,7 @@ const HomeScreen: React.FC = () => {
 
   const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().month() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(dayjs().year());
+  const monthInputRef = useRef<HTMLInputElement>(null);
 
   const userName = useAppSelector(state => state.settings.userName);
   const userId = useAppSelector(state => state.settings.userId);
@@ -177,8 +178,8 @@ const HomeScreen: React.FC = () => {
   const renderTransactionItems = () => {
     if (recentTransactions.length === 0) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '36px 0', gap: '10px' }}>
-          <Icon name="receipt-text-outline" size={44} color={theme.secondaryText} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '36px 0', gap: '10px' }}>
+          <Icon name="alert-circle-outline" size={44} color={theme.secondaryText} />
           <span style={{ fontSize: '14px', color: theme.secondaryText }}>No transactions yet</span>
         </div>
       );
@@ -249,7 +250,7 @@ const HomeScreen: React.FC = () => {
           >
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: '400' }}>
-                {getGreeting()}, {userName}
+                {getGreeting()} {userName}
               </span>
               <span style={{ fontSize: '20px', fontWeight: '700', color: COLORS.white, marginTop: '2px' }}>
                 {dayjs().month(selectedMonth - 1).year(selectedYear).format('MMMM YYYY')}
@@ -259,6 +260,7 @@ const HomeScreen: React.FC = () => {
             {/* Calendar month-year picker overlaying button */}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <button
+                onClick={() => monthInputRef.current?.showPicker()}
                 style={{
                   width: '44px',
                   height: '44px',
@@ -276,6 +278,7 @@ const HomeScreen: React.FC = () => {
                 <Icon name="calendar-month-outline" size={22} color={COLORS.white} />
               </button>
               <input
+                ref={monthInputRef}
                 type="month"
                 value={`${selectedYear}-${selectedMonth.toString().padStart(2, '0')}`}
                 onChange={(e) => {
@@ -288,12 +291,10 @@ const HomeScreen: React.FC = () => {
                 }}
                 style={{
                   position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
+                  width: 0,
+                  height: 0,
                   opacity: 0,
-                  cursor: 'pointer',
+                  pointerEvents: 'none',
                   border: 'none',
                   outline: 'none',
                 }}

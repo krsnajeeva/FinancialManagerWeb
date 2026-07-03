@@ -18,7 +18,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
   onMenuPress,
 }) => {
   const theme = useTheme();
-  const [isBalanceHidden, setIsBalanceHidden] = React.useState(false);
+  const [isBalanceHidden, setIsBalanceHidden] = React.useState(true);
 
   // Convert array colors list to CSS linear-gradient string
   const gradientString = `linear-gradient(135deg, ${theme.primaryGradient.join(', ')})`;
@@ -83,7 +83,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
             letterSpacing: '0.3px',
           }}
         >
-          {isBalanceHidden ? '******' : `₹ ${formatAmount(totalBalance)}`}
+          {isBalanceHidden ? '***' : `₹ ${formatAmount(totalBalance)}`}
         </span>
       </div>
 
@@ -115,7 +115,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
             <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: '500' }}>Income</span>
           </div>
           <span style={{ fontSize: '18px', fontWeight: '700' }}>
-            {isBalanceHidden ? '******' : `₹ ${formatAmount(income)}`}
+            {isBalanceHidden ? '***' : `₹ ${formatAmount(income)}`}
           </span>
         </div>
 
@@ -138,7 +138,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
             <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: '500' }}>Expenses</span>
           </div>
           <span style={{ fontSize: '18px', fontWeight: '700' }}>
-            {isBalanceHidden ? '******' : `₹ ${formatAmount(expenses)}`}
+            {isBalanceHidden ? '***' : `₹ ${formatAmount(expenses)}`}
           </span>
         </div>
       </div>
