@@ -12,6 +12,7 @@ import { getCurrentDate } from '../../utils/date';
 import { cardFirebaseService } from '../../services/firebase/cardService';
 import { USE_STATIC_DATA } from '../../config/appConfig';
 import { CreditCardItem, CardTransaction } from '../../types/card';
+import { CARD_THEMES } from '../../constants/cardThemes';
 
 const MyCardsScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -342,6 +343,7 @@ const MyCardsScreen: React.FC = () => {
               const cardExpenses = cardTxs.filter(t => t.type !== 'income').reduce((sum, t) => sum + t.amount, 0);
               const cardPayments = cardTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
               const cardAvailable = Math.max(0, card.totalLimit - Math.max(0, (card.usedAmount || 0) + cardExpenses - cardPayments));
+              const cardThemeObj = CARD_THEMES.find(t => t.id === (card.cardTheme || 'theme1')) || CARD_THEMES[0];
 
               return (
                 <div
@@ -352,7 +354,9 @@ const MyCardsScreen: React.FC = () => {
                     scrollSnapAlign: 'start',
                     height: '210px',
                     borderRadius: '20px',
-                    background: 'linear-gradient(135deg, #0A0D28 0%, #161A42 50%, #2A174E 100%)',
+                    backgroundImage: `url(${cardThemeObj.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                     color: '#FFFFFF',
                     padding: '20px',
                     boxSizing: 'border-box',

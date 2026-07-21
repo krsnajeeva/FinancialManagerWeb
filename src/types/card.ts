@@ -10,6 +10,7 @@ export interface CreditCardItem {
   cvv: string;
   statementDate: string;
   paymentDate: string;
+  cardTheme?: string;
   userId?: string;
   createdAt?: string;
 }

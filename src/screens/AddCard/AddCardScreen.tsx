@@ -7,6 +7,7 @@ import Icon from '../../components/common/Icon';
 import ScreenHeader from '../../components/cards/ScreenHeader';
 import { USE_STATIC_DATA } from '../../config/appConfig';
 import { cardFirebaseService } from '../../services/firebase/cardService';
+import { CARD_THEMES } from '../../constants/cardThemes';
 import { CreditCardItem } from '../../types/card';
 
 const AddCardScreen: React.FC = () => {
@@ -24,6 +25,7 @@ const AddCardScreen: React.FC = () => {
   const [cvv, setCvv] = useState('');
   const [statementDate, setStatementDate] = useState('');
   const [paymentDate, setPaymentDate] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('theme1');
   const [submitting, setSubmitting] = useState(false);
 
   // Format Card Number (space every 4 digits)
@@ -53,6 +55,7 @@ const AddCardScreen: React.FC = () => {
       cvv: cvv.trim() || '123',
       statementDate: statementDate.trim() || '10/05/2026',
       paymentDate: paymentDate.trim() || '20/05/2026',
+      cardTheme: selectedTheme,
       userId: userId || undefined,
       createdAt: new Date().toISOString(),
     };
@@ -303,6 +306,65 @@ const AddCardScreen: React.FC = () => {
               outline: 'none',
             }}
           />
+        </div>
+
+        {/* Choose Card Theme */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Choose Card Theme</label>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '12px',
+              overflowX: 'auto',
+              paddingBottom: '10px',
+              scrollbarWidth: 'thin',
+            }}
+          >
+            {CARD_THEMES.map(t => {
+              const isSelected = t.id === selectedTheme;
+              return (
+                <div
+                  key={t.id}
+                  onClick={() => setSelectedTheme(t.id)}
+                  style={{
+                    minWidth: '105px',
+                    height: '68px',
+                    borderRadius: '12px',
+                    border: `2px solid ${isSelected ? theme.accent : 'transparent'}`,
+                    boxShadow: isSelected ? `0 0 0 2px ${theme.accent}` : 'none',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    flexShrink: 0,
+                    transition: 'all 0.2s ease',
+                  }}
+                  className="active-opacity"
+                >
+                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {isSelected && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '6px',
+                        right: '6px',
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '10px',
+                        backgroundColor: theme.accent,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#FFFFFF',
+                      }}
+                    >
+                      <Icon name="check" size={14} color="#FFFFFF" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Submit Button */}
