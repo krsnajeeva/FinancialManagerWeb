@@ -288,8 +288,8 @@ const MyCardsScreen: React.FC = () => {
                       scrollSnapAlign: 'start',
                       height: '210px',
                       borderRadius: '20px',
-                      border: '2.5px dashed #CBD5E1',
-                      backgroundColor: theme.isDark ? '#1E293B' : '#F8FAFC',
+                      border: `2.5px dashed ${theme.border}`,
+                      backgroundColor: theme.isDark ? '#1E293B' : theme.background,
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -306,9 +306,9 @@ const MyCardsScreen: React.FC = () => {
                         width: '160px',
                         height: '105px',
                         borderRadius: '14px',
-                        background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
+                        background: theme.buttonGradient ? `linear-gradient(135deg, ${theme.buttonGradient.join(', ')})` : theme.accent,
                         position: 'relative',
-                        boxShadow: '0 8px 18px rgba(59, 130, 246, 0.25)',
+                        boxShadow: `0 8px 18px ${theme.accent}40`,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
@@ -316,7 +316,7 @@ const MyCardsScreen: React.FC = () => {
                         boxSizing: 'border-box',
                       }}
                     >
-                      <div style={{ width: '100%', height: '14px', backgroundColor: '#1E1B4B', borderRadius: '3px', marginTop: '10px' }} />
+                      <div style={{ width: '100%', height: '14px', backgroundColor: theme.isDark ? '#000000' : '#1E1B4B', borderRadius: '3px', marginTop: '10px' }} />
                       <div style={{ width: '60px', height: '6px', backgroundColor: '#FFFFFF', opacity: 0.8, borderRadius: '3px' }} />
                       <div
                         style={{
@@ -326,11 +326,11 @@ const MyCardsScreen: React.FC = () => {
                           width: '44px',
                           height: '44px',
                           borderRadius: '22px',
-                          backgroundColor: '#22C55E',
+                          backgroundColor: theme.accent,
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          boxShadow: '0 4px 10px rgba(34, 197, 94, 0.4)',
+                          boxShadow: `0 4px 10px ${theme.accent}4D`,
                           color: '#FFFFFF',
                         }}
                       >
@@ -358,8 +358,9 @@ const MyCardsScreen: React.FC = () => {
                     height: '210px',
                     borderRadius: '20px',
                     backgroundImage: `url(${cardThemeObj.image})`,
-                    backgroundSize: 'cover',
+                    backgroundSize: '110%',
                     backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
                     color: '#FFFFFF',
                     padding: '20px',
                     boxSizing: 'border-box',
@@ -519,7 +520,7 @@ const MyCardsScreen: React.FC = () => {
                   <button
                     onClick={handleOpenPayModal}
                     style={{
-                      backgroundColor: '#7E22CE',
+                      backgroundColor: theme.accent,
                       color: '#FFFFFF',
                       fontSize: '13px',
                       fontWeight: '700',
@@ -527,7 +528,7 @@ const MyCardsScreen: React.FC = () => {
                       borderRadius: '10px',
                       border: 'none',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 10px rgba(126, 34, 206, 0.3)',
+                      boxShadow: `0 4px 10px ${theme.accent}4D`,
                     }}
                     className="active-opacity"
                   >
@@ -623,29 +624,31 @@ const MyCardsScreen: React.FC = () => {
       </div>
 
       {/* FAB (+) Button for Add Card Transaction */}
-      <button
-        onClick={() => navigate(activeCard ? `/add-card-transaction?cardId=${activeCard.id}` : '/add-card-transaction')}
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '28px',
-          backgroundColor: '#2D7E78',
-          border: 'none',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: '#FFFFFF',
-          cursor: 'pointer',
-          boxShadow: '0 8px 18px rgba(45, 126, 120, 0.4)',
-          zIndex: 100,
-        }}
-        className="active-opacity"
-      >
-        <Icon name="plus" size={28} color="#FFFFFF" />
-      </button>
+      {cards.length > 0 && !isAddCardSlide && (
+        <button
+          onClick={() => navigate(activeCard ? `/add-card-transaction?cardId=${activeCard.id}` : '/add-card-transaction')}
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            width: '56px',
+            height: '56px',
+            borderRadius: '28px',
+            backgroundColor: theme.accent,
+            border: 'none',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            boxShadow: `0 8px 18px ${theme.accent}66`,
+            zIndex: 100,
+          }}
+          className="active-opacity"
+        >
+          <Icon name="plus" size={28} color="#FFFFFF" />
+        </button>
+      )}
 
       {/* Pay Now Modal */}
       {showPayModal && (
@@ -755,12 +758,12 @@ const MyCardsScreen: React.FC = () => {
                     padding: '12px 24px',
                     borderRadius: '10px',
                     border: 'none',
-                    backgroundColor: '#7E22CE',
+                    backgroundColor: theme.accent,
                     color: '#FFFFFF',
                     fontSize: '15px',
                     fontWeight: '700',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 10px rgba(126, 34, 206, 0.3)',
+                    boxShadow: `0 4px 10px ${theme.accent}4D`,
                   }}
                   className="active-opacity"
                 >

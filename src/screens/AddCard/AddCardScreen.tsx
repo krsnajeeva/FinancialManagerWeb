@@ -373,7 +373,7 @@ const AddCardScreen: React.FC = () => {
           disabled={submitting}
           style={{
             marginTop: '10px',
-            backgroundColor: '#3B82F6',
+            backgroundColor: theme.accent,
             color: '#FFFFFF',
             fontSize: '16px',
             fontWeight: '600',
@@ -381,7 +381,7 @@ const AddCardScreen: React.FC = () => {
             borderRadius: '12px',
             border: 'none',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+            boxShadow: `0 4px 12px ${theme.accent}4D`,
             transition: 'background-color 0.2s',
           }}
           className="active-opacity"
