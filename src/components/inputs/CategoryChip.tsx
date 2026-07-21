@@ -25,6 +25,7 @@ const CategoryChip: React.FC<CategoryChipProps> = ({
 
   return (
     <button
+      type="button"
       onClick={onPress}
       style={{
         display: 'flex',

@@ -41,6 +41,7 @@ const SelectionGrid: React.FC<SelectionGridProps> = ({
         return (
           <button
             key={item.id}
+            type="button"
             onClick={() => onSelect(item.id)}
             style={{
               display: 'flex',
