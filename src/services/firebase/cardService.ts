@@ -34,6 +34,7 @@ export const cardFirebaseService = {
           cvv: data.cvv || '',
           statementDate: data.statementDate || '',
           paymentDate: data.paymentDate || '',
+          cardTheme: data.cardTheme || 'theme1',
           userId: data.userId || '',
           createdAt: data.createdAt || new Date().toISOString(),
         } as CreditCardItem;
