@@ -271,6 +271,9 @@ const MyCardsScreen: React.FC = () => {
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               gap: '0px',
+              paddingTop: '12px',
+              paddingBottom: '12px',
+              marginTop: '-24px',
             }}
           >
             {sliderData.map((item: any) => {
@@ -355,9 +358,8 @@ const MyCardsScreen: React.FC = () => {
                     height: '210px',
                     borderRadius: '20px',
                     backgroundImage: `url(${cardThemeObj.image})`,
-                    backgroundSize: '108% 112%',
+                    backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
                     color: '#FFFFFF',
                     padding: '20px',
                     boxSizing: 'border-box',
