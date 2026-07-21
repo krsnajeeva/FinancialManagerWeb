@@ -274,6 +274,44 @@ const ProfileScreen: React.FC = () => {
 
           <div style={{ height: '1px', backgroundColor: theme.border, margin: '0 4px' }} />
 
+          {/* My Cards Row */}
+          <button
+            onClick={() => navigate('/my-cards')}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 0',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              width: '100%',
+            }}
+            className="active-opacity"
+          >
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '20px',
+                  backgroundColor: theme.isDark ? '#2D2D2D' : '#E8F0FE',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: '16px',
+                }}
+              >
+                <Icon name="credit-card-outline" size={22} color={theme.accent} />
+              </div>
+              <span style={{ fontSize: '16px', fontWeight: '600', color: theme.primaryText }}>My Cards</span>
+            </div>
+            <Icon name="chevron-right" size={24} color="#B0B0B0" />
+          </button>
+
+          <div style={{ height: '1px', backgroundColor: theme.border, margin: '0 4px' }} />
+
           {/* App Theme Row */}
           <button
             onClick={() => setShowThemeModal(true)}

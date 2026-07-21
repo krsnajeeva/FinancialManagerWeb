@@ -27,6 +27,9 @@ import AddExpenseScreen from './screens/AddExpense/AddExpenseScreen';
 import AddIncomeScreen from './screens/AddIncome/AddIncomeScreen';
 import AddBudgetScreen from './screens/AddBudget/AddBudgetScreen';
 import EditProfileScreen from './screens/EditProfile/EditProfileScreen';
+import MyCardsScreen from './screens/MyCards/MyCardsScreen';
+import AddCardScreen from './screens/AddCard/AddCardScreen';
+import AddCardTransactionScreen from './screens/AddCardTransaction/AddCardTransactionScreen';
 
 // Route Guards
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -154,6 +157,30 @@ const NavigationWrapper: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditProfileScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-cards"
+          element={
+            <ProtectedRoute>
+              <MyCardsScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-card"
+          element={
+            <ProtectedRoute>
+              <AddCardScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-card-transaction"
+          element={
+            <ProtectedRoute>
+              <AddCardTransactionScreen />
             </ProtectedRoute>
           }
         />

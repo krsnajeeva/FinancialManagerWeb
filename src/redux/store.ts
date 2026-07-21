@@ -13,6 +13,7 @@ import {
 import incomeReducer from './slices/incomeSlice';
 import expenseReducer from './slices/expenseSlice';
 import budgetReducer from './slices/budgetSlice';
+import cardReducer from './slices/cardSlice';
 import settingsReducer from './slices/settingsSlice';
 
 const customStorage = {
@@ -33,13 +34,14 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: customStorage,
-  whitelist: ['income', 'expense', 'budget', 'settings'],
+  whitelist: ['income', 'expense', 'budget', 'card', 'settings'],
 };
 
 const rootReducer = combineReducers({
   income: incomeReducer,
   expense: expenseReducer,
   budget: budgetReducer,
+  card: cardReducer,
   settings: settingsReducer,
 });
 

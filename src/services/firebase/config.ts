@@ -7,6 +7,8 @@ export const COLLECTIONS = {
   EXPENSES: 'expenses',
   BUDGETS: 'budgets',
   CATEGORY_BUDGETS: 'categoryBudgets',
+  CARDS: 'cards',
+  CARD_TRANSACTIONS: 'cardTransactions',
   SETTINGS: 'settings',
 };
 
