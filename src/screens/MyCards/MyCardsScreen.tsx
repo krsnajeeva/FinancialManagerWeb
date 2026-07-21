@@ -365,6 +365,8 @@ const MyCardsScreen: React.FC = () => {
                     justifyContent: 'space-between',
                     position: 'relative',
                     overflow: 'hidden',
+                    WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+                    isolation: 'isolate',
                     flexShrink: 0,
                   }}
                 >
