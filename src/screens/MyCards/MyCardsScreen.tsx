@@ -13,6 +13,7 @@ import { cardFirebaseService } from '../../services/firebase/cardService';
 import { USE_STATIC_DATA } from '../../config/appConfig';
 import { CreditCardItem, CardTransaction } from '../../types/card';
 import { CARD_THEMES } from '../../constants/cardThemes';
+import { selectCardAvailableLimits } from '../../redux/selectors';
 
 const MyCardsScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const MyCardsScreen: React.FC = () => {
   const cards = useAppSelector(state => state.card?.cards) || [];
   const cardTransactions = useAppSelector(state => state.card?.cardTransactions) || [];
   const userId = useAppSelector(state => state.settings.userId);
+  const availableLimits = useAppSelector(selectCardAvailableLimits);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHideDetails, setIsHideDetails] = useState(true);
@@ -72,8 +74,8 @@ const MyCardsScreen: React.FC = () => {
   const cardLimit = activeCard ? activeCard.totalLimit : 0;
   const usedAmount = activeCard ? Math.max(0, (activeCard.usedAmount || 0) + netCardExpense) : 0;
 
-  // Available Limit = Card Limit - Total Transactions
-  const availableLimit = Math.max(0, cardLimit - usedAmount);
+  // Available Limit = Card Limit - Total Transactions (Or Shared)
+  const availableLimit = activeCard ? (availableLimits[activeCard.id] ?? 0) : 0;
   const usedPercentage = cardLimit > 0 ? Math.min(100, Math.round((usedAmount / cardLimit) * 100)) : 0;
 
   // Due Calculation: Due = Payment Date - Statement Date
@@ -145,6 +147,40 @@ const MyCardsScreen: React.FC = () => {
     );
     if (confirmDelete) {
       try {
+        // Handle shared limit promotion: if this is a primary card, promote the first secondary card
+        const secondaryCards = cards.filter(c => c.sharedCardId === card.id);
+        if (secondaryCards.length > 0) {
+          const newPrimary = secondaryCards[0];
+          const updatedNewPrimary: CreditCardItem = {
+            ...newPrimary,
+            sharedCardId: undefined,
+            totalLimit: card.totalLimit,
+          };
+
+          if (!USE_STATIC_DATA && userId) {
+            await cardFirebaseService.update(newPrimary.id, {
+              sharedCardId: '',
+              totalLimit: card.totalLimit,
+            });
+          }
+          dispatch(updateCard(updatedNewPrimary));
+
+          // Update other secondary cards to point to the new promoted primary card
+          for (let i = 1; i < secondaryCards.length; i++) {
+            const secCard = secondaryCards[i];
+            const updatedSecCard: CreditCardItem = {
+              ...secCard,
+              sharedCardId: newPrimary.id,
+            };
+            if (!USE_STATIC_DATA && userId) {
+              await cardFirebaseService.update(secCard.id, {
+                sharedCardId: newPrimary.id,
+              });
+            }
+            dispatch(updateCard(updatedSecCard));
+          }
+        }
+
         if (!USE_STATIC_DATA && userId) {
           await cardFirebaseService.deleteCardAndTransactions(card.id);
         }
@@ -342,10 +378,7 @@ const MyCardsScreen: React.FC = () => {
               }
 
               const card: CreditCardItem = item;
-              const cardTxs = cardTransactions.filter(t => t.cardId === card.id);
-              const cardExpenses = cardTxs.filter(t => t.type !== 'income').reduce((sum, t) => sum + t.amount, 0);
-              const cardPayments = cardTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-              const cardAvailable = Math.max(0, card.totalLimit - Math.max(0, (card.usedAmount || 0) + cardExpenses - cardPayments));
+              const cardAvailable = availableLimits[card.id] ?? 0;
               const cardThemeObj = CARD_THEMES.find(t => t.id === (card.cardTheme || 'theme1')) || CARD_THEMES[0];
 
               return (
@@ -411,8 +444,13 @@ const MyCardsScreen: React.FC = () => {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>
+                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         Available Limit
+                        {(card.sharedCardId || cards.some(c => c.sharedCardId === card.id)) && (
+                          <span style={{ fontSize: '9px', backgroundColor: 'rgba(255,255,255,0.25)', padding: '1px 6px', borderRadius: '8px', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.5px' }}>
+                            Shared
+                          </span>
+                        )}
                       </span>
                       <span style={{ fontSize: '20px', fontWeight: '700', marginTop: '2px' }}>
                         {isHideDetails ? '••••••' : formatAmount(cardAvailable)}
@@ -505,7 +543,7 @@ const MyCardsScreen: React.FC = () => {
                 </div>
 
                 <div style={{ textAlign: 'center', fontSize: '13px', color: theme.secondaryText, fontWeight: '500' }}>
-                  Total Credit Limit: ₹{formatAmount(cardLimit)}
+                  Total Credit Limit: ₹{formatAmount(cardLimit)} {activeCard && (activeCard.sharedCardId || cards.some(c => c.sharedCardId === activeCard.id)) ? '(Shared Limit)' : ''}
                 </div>
 
                 <div style={{ height: '1px', backgroundColor: theme.border, margin: '4px 0' }} />
@@ -572,12 +610,6 @@ const MyCardsScreen: React.FC = () => {
               <span style={{ fontSize: '17px', fontWeight: '700', color: theme.primaryText }}>
                 Transactions History
               </span>
-              <button
-                onClick={() => navigate('/statistics')}
-                style={{ border: 'none', background: 'none', color: theme.accent, fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-              >
-                See all
-              </button>
             </div>
 
             {cards.length === 0 || isAddCardSlide ? (

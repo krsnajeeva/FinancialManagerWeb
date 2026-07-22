@@ -171,3 +171,36 @@ export const selectExpensesByCategory = createSelector(
       .sort((a, b) => b.amount - a.amount);
   }
 );
+
+export const selectCards = (state: RootState) => state.card?.cards || [];
+export const selectCardTransactions = (state: RootState) => state.card?.cardTransactions || [];
+
+export const selectCardAvailableLimits = createSelector(
+  [selectCards, selectCardTransactions],
+  (cards, transactions): Record<string, number> => {
+    const limitsMap: Record<string, number> = {};
+
+    cards.forEach(card => {
+      // 1. Identify all cards in this shared limit group
+      const primaryCardId = card.sharedCardId || card.id;
+      const groupCards = cards.filter(c => c.id === primaryCardId || c.sharedCardId === primaryCardId);
+
+      // 2. Sum the group's total limit (defined by the primary card)
+      const primaryCard = cards.find(c => c.id === primaryCardId) || card;
+      const groupTotalLimit = primaryCard.totalLimit;
+
+      // 3. Sum the base used amounts + transactions of all group cards
+      const groupSpent = groupCards.reduce((sum, gc) => {
+        const cardTxs = transactions.filter(t => t.cardId === gc.id);
+        const cardTxTotal = cardTxs.reduce((txSum, t) => txSum + t.amount, 0);
+        return sum + (gc.usedAmount || 0) + cardTxTotal;
+      }, 0);
+
+      // 4. Set available limit
+      limitsMap[card.id] = Math.max(0, groupTotalLimit - groupSpent);
+    });
+
+    return limitsMap;
+  }
+);
+

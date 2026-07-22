@@ -13,6 +13,7 @@ export interface CreditCardItem {
   cardTheme?: string;
   userId?: string;
   createdAt?: string;
+  sharedCardId?: string;
 }
 
 export interface CardTransaction {

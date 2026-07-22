@@ -37,6 +37,7 @@ export const cardFirebaseService = {
           cardTheme: data.cardTheme || 'theme1',
           userId: data.userId || '',
           createdAt: data.createdAt || new Date().toISOString(),
+          sharedCardId: data.sharedCardId || undefined,
         } as CreditCardItem;
       });
       return list;
@@ -48,7 +49,14 @@ export const cardFirebaseService = {
 
   add: async (card: Omit<CreditCardItem, 'id'>): Promise<string> => {
     try {
-      const docRef = await addDoc(collection(db, COLLECTIONS.CARDS), card);
+      const cleanedCard: any = {};
+      Object.keys(card).forEach(key => {
+        const val = (card as any)[key];
+        if (val !== undefined) {
+          cleanedCard[key] = val;
+        }
+      });
+      const docRef = await addDoc(collection(db, COLLECTIONS.CARDS), cleanedCard);
       return docRef.id;
     } catch (err) {
       console.warn('Firestore add card failed or permissions missing:', err);
@@ -58,7 +66,14 @@ export const cardFirebaseService = {
 
   update: async (id: string, card: Partial<CreditCardItem>): Promise<void> => {
     try {
-      await updateDoc(doc(db, COLLECTIONS.CARDS, id), card);
+      const cleanedCard: any = {};
+      Object.keys(card).forEach(key => {
+        const val = (card as any)[key];
+        if (val !== undefined) {
+          cleanedCard[key] = val;
+        }
+      });
+      await updateDoc(doc(db, COLLECTIONS.CARDS, id), cleanedCard);
     } catch (err) {
       console.warn('Firestore update card failed or permissions missing:', err);
     }

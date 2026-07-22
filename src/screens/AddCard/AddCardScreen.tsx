@@ -28,11 +28,23 @@ const AddCardScreen: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState('theme1');
   const [submitting, setSubmitting] = useState(false);
 
+  const cards = useAppSelector(state => state.card?.cards) || [];
+  const [isSharedLimit, setIsSharedLimit] = useState(false);
+  const [sharedWithCardId, setSharedWithCardId] = useState('');
+
   // Format Card Number (space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
     const formatted = raw.match(/.{1,4}/g)?.join(' ') || raw;
     setCardNumber(formatted);
+  };
+
+  const handleSharedCardChange = (cardId: string) => {
+    setSharedWithCardId(cardId);
+    const selectedCard = cards.find(c => c.id === cardId);
+    if (selectedCard) {
+      setTotalLimit(selectedCard.totalLimit.toString());
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,6 +55,11 @@ const AddCardScreen: React.FC = () => {
     }
 
     setSubmitting(true);
+    const selectedParentCard = cards.find(c => c.id === sharedWithCardId);
+    const finalSharedCardId = isSharedLimit && selectedParentCard
+      ? (selectedParentCard.sharedCardId || selectedParentCard.id)
+      : undefined;
+
     const newCard: CreditCardItem = {
       id: Date.now().toString(),
       cardName: cardName.trim(),
@@ -58,6 +75,7 @@ const AddCardScreen: React.FC = () => {
       cardTheme: selectedTheme,
       userId: userId || undefined,
       createdAt: new Date().toISOString(),
+      sharedCardId: finalSharedCardId,
     };
 
     try {
@@ -181,6 +199,81 @@ const AddCardScreen: React.FC = () => {
           />
         </div>
 
+        {/* Shared Limit Toggle (Only if other cards exist) */}
+        {cards.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: theme.primaryText }}>Shared Credit Limit</span>
+                <span style={{ fontSize: '12px', color: theme.secondaryText }}>Share limit with an existing card</span>
+              </div>
+              <div 
+                onClick={() => {
+                  const next = !isSharedLimit;
+                  setIsSharedLimit(next);
+                  if (!next) {
+                    setSharedWithCardId('');
+                    setTotalLimit('');
+                  } else if (cards.length > 0) {
+                    handleSharedCardChange(cards[0].id);
+                  }
+                }}
+                style={{
+                  width: '46px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: isSharedLimit ? theme.accent : theme.border,
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                }}
+              >
+                <div 
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
+                    position: 'absolute',
+                    top: '2px',
+                    left: isSharedLimit ? '24px' : '2px',
+                    transition: 'left 0.2s',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Shared With Card Dropdown */}
+            {isSharedLimit && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Select Card to Share Limit With</label>
+                <select
+                  value={sharedWithCardId}
+                  onChange={(e) => handleSharedCardChange(e.target.value)}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: `1px solid ${theme.border}`,
+                    backgroundColor: theme.cardBackground,
+                    color: theme.primaryText,
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {cards.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.cardName} (•••• {c.cardNumber.slice(-4)}) - Limit: ₹{c.totalLimit.toLocaleString()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Total Limit */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Total Limit</label>
@@ -188,16 +281,18 @@ const AddCardScreen: React.FC = () => {
             type="number"
             value={totalLimit}
             onChange={(e) => setTotalLimit(e.target.value)}
+            disabled={isSharedLimit}
             placeholder="e.g. 187000"
             style={{
               padding: '14px 16px',
               borderRadius: '12px',
               border: `1px solid ${theme.border}`,
-              backgroundColor: theme.cardBackground,
-              color: theme.primaryText,
+              backgroundColor: isSharedLimit ? (theme.isDark ? '#2D2D2D' : '#F1F5F9') : theme.cardBackground,
+              color: isSharedLimit ? theme.secondaryText : theme.primaryText,
               fontSize: '15px',
               fontWeight: '500',
               outline: 'none',
+              cursor: isSharedLimit ? 'not-allowed' : 'text',
             }}
           />
         </div>
@@ -328,6 +423,7 @@ const AddCardScreen: React.FC = () => {
                   key={t.id}
                   onClick={() => setSelectedTheme(t.id)}
                   style={{
+                    width: '105px',
                     minWidth: '105px',
                     height: '68px',
                     borderRadius: '12px',
@@ -338,10 +434,14 @@ const AddCardScreen: React.FC = () => {
                     position: 'relative',
                     flexShrink: 0,
                     transition: 'all 0.2s ease',
+                    backgroundImage: `url(${t.image})`,
+                    backgroundSize: '116%',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    boxSizing: 'border-box',
                   }}
                   className="active-opacity"
                 >
-                  <img src={t.image} alt={t.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   {isSelected && (
                     <div
                       style={{
