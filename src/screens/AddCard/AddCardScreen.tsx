@@ -23,8 +23,8 @@ const AddCardScreen: React.FC = () => {
   const [cardHolderName, setCardHolderName] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
-  const [statementDate, setStatementDate] = useState('');
-  const [paymentDate, setPaymentDate] = useState('');
+  const [statementDay, setStatementDay] = useState('');
+  const [paymentDueDays, setPaymentDueDays] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('theme1');
   const [submitting, setSubmitting] = useState(false);
 
@@ -70,8 +70,8 @@ const AddCardScreen: React.FC = () => {
       cardHolderName: cardHolderName.trim() || 'Card Holder',
       expiryDate: expiryDate.trim() || '08/30',
       cvv: cvv.trim() || '123',
-      statementDate: statementDate.trim() || '10/05/2026',
-      paymentDate: paymentDate.trim() || '20/05/2026',
+      statementDay: parseInt(statementDay) || 1,
+      paymentDueDays: parseInt(paymentDueDays) || 20,
       cardTheme: selectedTheme,
       userId: userId || undefined,
       createdAt: new Date().toISOString(),
@@ -361,14 +361,21 @@ const AddCardScreen: React.FC = () => {
           />
         </div>
 
-        {/* Statement Date */}
+        {/* Bill Generation Day */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Statement Date</label>
+          <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Bill Generation Day</label>
           <input
-            type="date"
-            value={statementDate}
-            onChange={(e) => setStatementDate(e.target.value)}
-            placeholder="Select Statement Date"
+            type="number"
+            min={1}
+            max={31}
+            value={statementDay}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= 31)) {
+                setStatementDay(val);
+              }
+            }}
+            placeholder="e.g. 24"
             style={{
               padding: '14px 16px',
               borderRadius: '12px',
@@ -380,16 +387,24 @@ const AddCardScreen: React.FC = () => {
               outline: 'none',
             }}
           />
+          <span style={{ fontSize: '11px', color: theme.secondaryText, marginTop: '-2px' }}>Day of month when your statement is generated</span>
         </div>
 
-        {/* Payment Date */}
+        {/* Payment Due Days */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Payment Date</label>
+          <label style={{ fontSize: '13px', fontWeight: '500', color: theme.secondaryText }}>Payment Due (Days after bill)</label>
           <input
-            type="date"
-            value={paymentDate}
-            onChange={(e) => setPaymentDate(e.target.value)}
-            placeholder="Select Payment Date"
+            type="number"
+            min={1}
+            max={60}
+            value={paymentDueDays}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= 60)) {
+                setPaymentDueDays(val);
+              }
+            }}
+            placeholder="e.g. 20"
             style={{
               padding: '14px 16px',
               borderRadius: '12px',
@@ -401,6 +416,7 @@ const AddCardScreen: React.FC = () => {
               outline: 'none',
             }}
           />
+          <span style={{ fontSize: '11px', color: theme.secondaryText, marginTop: '-2px' }}>Number of days after statement to pay</span>
         </div>
 
         {/* Choose Card Theme */}

@@ -8,8 +8,8 @@ export interface CreditCardItem {
   cardHolderName: string;
   expiryDate: string;
   cvv: string;
-  statementDate: string;
-  paymentDate: string;
+  statementDay: number;
+  paymentDueDays: number;
   cardTheme?: string;
   userId?: string;
   createdAt?: string;

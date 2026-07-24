@@ -15,6 +15,16 @@ import { CreditCardItem, CardTransaction } from '../../types/card';
 import { CARD_THEMES } from '../../constants/cardThemes';
 import { selectCardAvailableLimits } from '../../redux/selectors';
 
+const getOrdinalSuffix = (day: number): string => {
+  if (day >= 11 && day <= 13) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+};
+
 const MyCardsScreen: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -79,41 +89,38 @@ const MyCardsScreen: React.FC = () => {
   const usedPercentage = cardLimit > 0 ? Math.min(100, Math.round((usedAmount / cardLimit) * 100)) : 0;
 
   // Due Calculation: Due = Payment Date - Statement Date
-  const calculateDueDays = () => {
-    if (!activeCard || !activeCard.statementDate || !activeCard.paymentDate) {
-      return 0;
+  const calculateDueDays = (): number | null => {
+    if (!activeCard || !activeCard.statementDay || !activeCard.paymentDueDays) {
+      return null;
     }
     try {
-      const parseCardDate = (dStr: string) => {
-        if (!dStr) return null;
-        const formats = ['DD/MM/YYYY', 'YYYY-MM-DD', 'DD-MM-YYYY', 'DD-MMM-YYYY', 'MM/DD/YYYY'];
-        const d = dayjs(dStr, formats);
-        if (d.isValid()) return d;
+      const today = dayjs();
+      const stmtDay = Math.min(activeCard.statementDay, today.daysInMonth());
 
-        const parts = dStr.trim().split(/[\/\-]/);
-        if (parts.length === 3) {
-          const day = parseInt(parts[0], 10);
-          const month = parseInt(parts[1], 10) - 1;
-          let year = parseInt(parts[2], 10);
-          if (year < 100) year += 2000;
-          if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-            const manual = dayjs(new Date(year, month, day));
-            if (manual.isValid()) return manual;
-          }
+      // Find the most recent statement date
+      let lastStatement = today.date(stmtDay);
+      if (lastStatement.isAfter(today)) {
+        lastStatement = lastStatement.subtract(1, 'month');
+        // Clamp day for the previous month
+        const prevMonthDays = lastStatement.daysInMonth();
+        if (activeCard.statementDay > prevMonthDays) {
+          lastStatement = lastStatement.date(prevMonthDays);
         }
-        return null;
-      };
-
-      const stmt = parseCardDate(activeCard.statementDate);
-      const paym = parseCardDate(activeCard.paymentDate);
-      if (stmt && paym) {
-        const diff = paym.diff(stmt, 'day');
-        return Math.max(0, diff);
       }
+
+      // Payment due date = last statement date + paymentDueDays
+      const paymentDue = lastStatement.add(activeCard.paymentDueDays, 'day');
+
+      // If payment is already past, hide the due (return null)
+      if (today.isAfter(paymentDue, 'day')) {
+        return null;
+      }
+
+      return Math.max(0, paymentDue.diff(today, 'day'));
     } catch (err) {
       console.log('Error calculating due days:', err);
     }
-    return 0;
+    return null;
   };
 
   const dueDays = calculateDueDays();
@@ -551,9 +558,15 @@ const MyCardsScreen: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <span style={{ fontSize: '18px', fontWeight: '700', color: theme.primaryText }}>₹{formatAmount(usedAmount)}</span>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#B78103', display: 'block', marginTop: '2px' }}>
-                      Due in {dueDays} days
-                    </span>
+                    {dueDays !== null ? (
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#B78103', display: 'block', marginTop: '2px' }}>
+                        {dueDays === 0 ? 'Due today' : `Due in ${dueDays} days`}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: theme.secondaryText, display: 'block', marginTop: '2px' }}>
+                        Bill Not Generated
+                      </span>
+                    )}
                   </div>
                   <button
                     onClick={handleOpenPayModal}
@@ -586,18 +599,18 @@ const MyCardsScreen: React.FC = () => {
               >
                 <div>
                   <span style={{ fontSize: '13px', fontWeight: '600', color: theme.primaryText, display: 'block' }}>
-                    Statement Date
+                    Bill Day
                   </span>
                   <span style={{ fontSize: '15px', fontWeight: '700', color: theme.primaryText, marginTop: '4px', display: 'block' }}>
-                    {activeCard.statementDate || '10/05/2026'}
+                    {activeCard.statementDay ? `${activeCard.statementDay}${getOrdinalSuffix(activeCard.statementDay)} of month` : '-'}
                   </span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '13px', fontWeight: '600', color: theme.primaryText, display: 'block' }}>
-                    Payment Date
+                    Due After
                   </span>
                   <span style={{ fontSize: '15px', fontWeight: '700', color: theme.primaryText, marginTop: '4px', display: 'block' }}>
-                    {activeCard.paymentDate || '20/05/2026'}
+                    {activeCard.paymentDueDays ? `${activeCard.paymentDueDays} days` : '-'}
                   </span>
                 </div>
               </div>
